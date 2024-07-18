@@ -2,7 +2,14 @@
 
 namespace App\Providers;
 
+use BaconQrCode\Common\Mode;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\IntlMoneyFormatter;
+use Money\Money;
+use NumberFormatter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +26,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Model::unguard();
+        Blade::stringable(function(Money $money){
+            $currencies = new ISOCurrencies();
+            $numberFormatter = new NumberFormatter('en_US' , NumberFormatter::CURRENCY);
+            $moneyFormatter = new IntlMoneyFormatter($numberFormatter,$currencies);
+
+            return $moneyFormatter->format($money);
+        });
+
     }
 }
